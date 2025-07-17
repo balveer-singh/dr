@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Private Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eaeaea;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      background: white;
+      margin-top: 20px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    #form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .message {
+      margin: 5px 0;
+    }
+
+    #login {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 100px;
+    }
+
+    #login input {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="login">
+  <h2>Start Private Chat</h2>
+  <input type="text" id="username" placeholder="Enter your name" />
+  <input type="text" id="roomid" placeholder="Enter Room ID" />
+  <button onclick="startChat()">Join Chat</button>
+</div>
+
+<div id="chat" style="display:none;">
+  <h2>Private Chat Room: <span id="roomDisplay"></span></h2>
+  <div id="chatbox"></div>
+  <div id="form">
+    <input type="text" id="msg" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  // ✅ Replace with your Firebase config
+ const firebaseConfig = {
+    apiKey: "AIzaSyAi-4xqpKxj7yDKgSbMHN7rWr3YPSqvOLo",
+    authDomain: "temp-chat-e0a5b.firebaseapp.com",
+    projectId: "temp-chat-e0a5b",
+    storageBucket: "temp-chat-e0a5b.firebasestorage.app",
+    messagingSenderId: "334450966256",
+    appId: "1:334450966256:web:5d07ec4281871a02620c35",
+    measurementId: "G-5JFFT2FRVE"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let username = "";
+  let roomID = "";
+  let sessionID = "";
+  let userRef = null;
+
+  function startChat() {
+    username = document.getElementById("username").value.trim();
+    roomID = document.getElementById("roomid").value.trim();
+
+    if (!username || !roomID) {
+      alert("Please enter both username and Room ID.");
+      return;
+    }
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("chat").style.display = "block";
+    document.getElementById("roomDisplay").innerText = roomID;
+
+    sessionID = "user_" + Math.random().toString(36).substr(2, 9);
+    userRef = db.ref("chats/" + roomID + "/" + sessionID);
+
+    // Listen to all messages in this room
+    db.ref("chats/" + roomID).on("child_added", function(snapshot) {
+      const innerRef = snapshot.ref;
+      innerRef.on("child_added", function(data) {
+        const message = data.val();
+        displayMessage(message.name + ": " + message.text);
+      });
+    });
+
+    // Clear messages from DB on refresh (temporary chat)
+    window.addEventListener("beforeunload", function () {
+      db.ref("chats/" + roomID + "/" + sessionID).remove();
+    });
+  }
+
+  function sendMessage() {
+    const msg = document.getElementById("msg").value.trim();
+    if (!msg || !userRef) return;
+    userRef.push({ name: username, text: msg });
+    document.getElementById("msg").value = "";
+  }
+
+  function displayMessage(text) {
+    const div = document.createElement("div");
+    div.className = "message";
+    div.textContent = text;
+    document.getElementById("chatbox").appendChild(div);
+    document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+  }
+</script>
+
+</body>
+</html>
