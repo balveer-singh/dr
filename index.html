@@ -1,145 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Private Chat</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #eaeaea;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Private Chat</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-    #chatbox {
-      width: 100%;
-      max-width: 600px;
-      height: 400px;
-      background: white;
-      margin-top: 20px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient to right, #e0f2f7, #c1e4f4); /* Light blue gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
 
-    #form {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
 
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-    }
+        #login, #chat {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 50px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-sizing: border-box;
+        }
 
-    .message {
-      margin: 5px 0;
-    }
+        #login {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+        }
 
-    #login {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 100px;
-    }
+        #login input, #form input, #login button, #form button {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #c8d9e0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
 
-    #login input {
-      margin: 5px;
-    }
-  </style>
+        #login input:focus, #form input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        #login button, #form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 0; /* Remove extra margin for the last button */
+        }
+
+        #login button:hover, #form button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        #chatbox {
+            width: 100%;
+            height: 350px; /* Slightly reduced height for mobile */
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            align-self: flex-start; /* Default for incoming messages */
+        }
+
+        .message.sent {
+            background-color: #dcf8c6; /* Light green for sent messages */
+            align-self: flex-end; /* Align sent messages to the right */
+            border-bottom-right-radius: 2px; /* Point to the sender */
+        }
+
+        .message.received {
+            background-color: #ffffff; /* White for received messages */
+            align-self: flex-start; /* Align received messages to the left */
+            border-bottom-left-radius: 2px; /* Point to the sender */
+        }
+
+        .message strong {
+            color: #075e54; /* Dark teal for username */
+            font-weight: 700;
+        }
+
+        #form {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        #form input {
+            flex-grow: 1; /* Take available space */
+            margin-bottom: 0; /* Override default margin */
+        }
+
+        #form button {
+            width: auto; /* Auto width for button */
+            flex-shrink: 0; /* Don't shrink the button */
+            padding: 12px 20px;
+        }
+
+        #roomDisplay {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* --- Media Queries for Mobile responsiveness --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            #login, #chat {
+                margin-top: 30px;
+                padding: 20px;
+                width: 100%; /* Full width on smaller screens */
+            }
+
+            h2 {
+                font-size: 22px;
+                margin-bottom: 15px;
+            }
+
+            #login input, #form input, #login button, #form button {
+                padding: 10px;
+                font-size: 15px;
+            }
+
+            #chatbox {
+                height: 300px; /* Shorter on mobile */
+                padding: 10px;
+            }
+
+            .message {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            #form {
+                flex-direction: row; /* Keep elements side by side if space allows */
+                gap: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div id="login">
-  <h2>Start Private Chat</h2>
-  <input type="text" id="username" placeholder="Enter your name" />
-  <input type="text" id="roomid" placeholder="Enter Room ID" />
-  <button onclick="startChat()">Join Chat</button>
+    <h2>Start Private Chat</h2>
+    <input type="text" id="username" placeholder="Enter your name" />
+    <input type="text" id="roomid" placeholder="Enter Room ID" />
+    <button onclick="startChat()">Join Chat</button>
 </div>
 
 <div id="chat" style="display:none;">
-  <h2>Private Chat Room: <span id="roomDisplay"></span></h2>
-  <div id="chatbox"></div>
-  <div id="form">
-    <input type="text" id="msg" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+    <h2>Private Chat Room: <span id="roomDisplay"></span></h2>
+    <div id="chatbox"></div>
+    <div id="form">
+        <input type="text" id="msg" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
-  // ✅ Replace with your Firebase config
- const firebaseConfig = {
-    apiKey: "AIzaSyAi-4xqpKxj7yDKgSbMHN7rWr3YPSqvOLo",
-    authDomain: "temp-chat-e0a5b.firebaseapp.com",
-    projectId: "temp-chat-e0a5b",
-    storageBucket: "temp-chat-e0a5b.firebasestorage.app",
-    messagingSenderId: "334450966256",
-    appId: "1:334450966256:web:5d07ec4281871a02620c35",
-    measurementId: "G-5JFFT2FRVE"
-  };
+    // ✅ Replace with your Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAi-4xqpKxj7yDKgSbMHN7rWr3YPSqvOLo",
+        authDomain: "temp-chat-e0a5b.firebaseapp.com",
+        projectId: "temp-chat-e0a5b",
+        storageBucket: "temp-chat-e0a5b.firebasestorage.app",
+        messagingSenderId: "334450966256",
+        appId: "1:334450966256:web:5d07ec4281871a02620c35",
+        measurementId: "G-5JFFT2FRVE"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  let username = "";
-  let roomID = "";
-  let sessionID = "";
-  let userRef = null;
+    let username = "";
+    let roomID = "";
+    let sessionID = "";
+    let userRef = null;
 
-  function startChat() {
-    username = document.getElementById("username").value.trim();
-    roomID = document.getElementById("roomid").value.trim();
+    function startChat() {
+        username = document.getElementById("username").value.trim();
+        roomID = document.getElementById("roomid").value.trim();
 
-    if (!username || !roomID) {
-      alert("Please enter both username and Room ID.");
-      return;
+        if (!username || !roomID) {
+            alert("Please enter both username and Room ID.");
+            return;
+        }
+
+        document.getElementById("login").style.display = "none";
+        document.getElementById("chat").style.display = "block";
+        document.getElementById("roomDisplay").innerText = roomID;
+
+        sessionID = "user_" + Math.random().toString(36).substr(2, 9);
+        userRef = db.ref("chats/" + roomID + "/" + sessionID);
+
+        // Listen to all messages in this room
+        db.ref("chats/" + roomID).on("child_added", function(snapshot) {
+            // Get the session ID of the sender
+            const senderSessionID = snapshot.key;
+            const innerRef = snapshot.ref;
+
+            innerRef.on("child_added", function(data) {
+                const message = data.val();
+                const isSentByCurrentUser = (senderSessionID === sessionID);
+                displayMessage(message.name, message.text, isSentByCurrentUser);
+            });
+        });
+
+        // Clear messages from DB on refresh (temporary chat)
+        window.addEventListener("beforeunload", function () {
+            // Only remove the current user's session data, not the whole room's chat
+            // If you want to clear the entire room's chat, you'd need a more robust mechanism
+            // (e.g., a "clear room" button for an admin, or a time-based deletion)
+            // For now, this just removes the 'user_xyz' node for the current user.
+            if (userRef) {
+                userRef.remove();
+            }
+        });
     }
 
-    document.getElementById("login").style.display = "none";
-    document.getElementById("chat").style.display = "block";
-    document.getElementById("roomDisplay").innerText = roomID;
+    function sendMessage() {
+        const msg = document.getElementById("msg").value.trim();
+        if (!msg || !userRef) return;
+        userRef.push({ name: username, text: msg, timestamp: firebase.database.ServerValue.TIMESTAMP });
+        document.getElementById("msg").value = "";
+    }
 
-    sessionID = "user_" + Math.random().toString(36).substr(2, 9);
-    userRef = db.ref("chats/" + roomID + "/" + sessionID);
+    function displayMessage(senderName, text, isSentByCurrentUser) {
+        const div = document.createElement("div");
+        div.className = "message " + (isSentByCurrentUser ? "sent" : "received");
+        
+        const nameSpan = document.createElement("strong");
+        nameSpan.textContent = senderName + ": ";
+        
+        const textSpan = document.createElement("span");
+        textSpan.textContent = text;
 
-    // Listen to all messages in this room
-    db.ref("chats/" + roomID).on("child_added", function(snapshot) {
-      const innerRef = snapshot.ref;
-      innerRef.on("child_added", function(data) {
-        const message = data.val();
-        displayMessage(message.name + ": " + message.text);
-      });
-    });
+        div.appendChild(nameSpan);
+        div.appendChild(textSpan);
 
-    // Clear messages from DB on refresh (temporary chat)
-    window.addEventListener("beforeunload", function () {
-      db.ref("chats/" + roomID + "/" + sessionID).remove();
-    });
-  }
-
-  function sendMessage() {
-    const msg = document.getElementById("msg").value.trim();
-    if (!msg || !userRef) return;
-    userRef.push({ name: username, text: msg });
-    document.getElementById("msg").value = "";
-  }
-
-  function displayMessage(text) {
-    const div = document.createElement("div");
-    div.className = "message";
-    div.textContent = text;
-    document.getElementById("chatbox").appendChild(div);
-    document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
-  }
+        document.getElementById("chatbox").appendChild(div);
+        document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+    }
 </script>
 
 </body>
